@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-WBostIJr/vL5nZBiqSiRpDKUmQa8hAPpHIgUzciW2oQ=' 'sha256-hko3HgQ+VOeQi47Zt350egvnxNDVZyhXyhLnJziweaM=' 'sha256-79AUgvtfYbL4N665Oy58ao/YZzcDTkl+fD2qVK/FO2g=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-5/ckqcrqiAFkrM7D86qIV9Gp3H93345M37GKS/oIKCw=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-WBostIJr/vL5nZBiqSiRpDKUmQa8hAPpHIgUzciW2oQ=' 'sha256-f7yPgV6cEQ4eSrK3CjZ3wHAwraJzW+YTRVV6DJsCJ58=' 'sha256-79AUgvtfYbL4N665Oy58ao/YZzcDTkl+fD2qVK/FO2g=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-5/ckqcrqiAFkrM7D86qIV9Gp3H93345M37GKS/oIKCw=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="DGJ CRM: contacts, opportunities, meetings, reports and connected follow-ups.">
   <title>DGJ | CRM</title>
@@ -3489,6 +3489,7 @@ extraFields = function (k, x) {
   if (k === "Tasks")
     return (
       old +
+      fieldHTML("Start Date", "startDate", x.startDate || "", "date") +
       selectHTML("Priority", "priority", x.priority || "Medium", [
         "Low",
         "Medium",
