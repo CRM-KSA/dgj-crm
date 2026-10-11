@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-WBostIJr/vL5nZBiqSiRpDKUmQa8hAPpHIgUzciW2oQ=' 'sha256-hko3HgQ+VOeQi47Zt350egvnxNDVZyhXyhLnJziweaM=' 'sha256-79AUgvtfYbL4N665Oy58ao/YZzcDTkl+fD2qVK/FO2g=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-KB3ifJmfKYv4wI1GYUlm6stueCdRyx5oipEsrzuOmg0=' 'sha256-xMHP7kVlbFR5C38QfcdUdcY4+MWWwwVtQU6EKt4793Q='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-WBostIJr/vL5nZBiqSiRpDKUmQa8hAPpHIgUzciW2oQ=' 'sha256-hko3HgQ+VOeQi47Zt350egvnxNDVZyhXyhLnJziweaM=' 'sha256-79AUgvtfYbL4N665Oy58ao/YZzcDTkl+fD2qVK/FO2g=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-5/ckqcrqiAFkrM7D86qIV9Gp3H93345M37GKS/oIKCw=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="DGJ CRM: contacts, opportunities, meetings, reports and connected follow-ups.">
   <title>DGJ | CRM</title>
@@ -53,6 +53,8 @@ body.signed-out>.sidebar,body.signed-out>header,body.signed-out>main{display:non
 .login-brand{font-size:29px;color:#414b36;font-weight:700;letter-spacing:2px}.login-card h1{font-size:27px;margin:24px 0 8px;font-family:Georgia,serif}.login-card p{color:#72786d;line-height:1.6}.login-card .primary{width:100%;margin-top:16px}.login-card label{margin-top:18px}.login-error{color:#a33b3b;background:#fff0ef;padding:12px;border-radius:8px;font-size:13px}.login-error:empty{display:none}
 #sync-status{border:0;background:transparent;color:#68765a;font-size:12px;cursor:pointer}.connection-alert{position:fixed;top:68px;left:245px;right:20px;z-index:80;background:#fff1e5;border:1px solid #e6b99b;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 15px #0001}.connection-alert[hidden]{display:none}.connection-alert span{flex:1}.connection-alert button{white-space:nowrap}
 .account-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #ecece6}.account-row .grow{flex:1}.account-row small{display:block;color:#737b6d}.account-controls{display:flex;gap:10px;flex-wrap:wrap}.settings-account{max-width:850px}.settings-account .panel{margin:20px 0}.signed-out #connection-alert{display:none}@media(max-width:760px){.connection-alert{left:12px;right:12px;top:72px;flex-wrap:wrap}.login-card{padding:24px}.account-controls button{flex:1}}
+
+.visitor-read-only [hidden]{display:none!important}
 
 </style>
 </head>
@@ -5835,6 +5837,7 @@ const DGJConnection = (() => {
   function clearSession(message = "") {
     session.epoch++;
     session.ready = false;
+    document.body.classList.remove("visitor-read-only");
     session.token = null;
     session.pending = null;
     session.writing = false;
@@ -6072,6 +6075,10 @@ const DGJConnection = (() => {
       return false;
     }
     const payload = difference(next);
+    if (user.role === "visitor" && payload.operations.length) {
+      toast("Visitor accounts can view records only.");
+      return false;
+    }
     if (!payload.operations.length && !payload.preferences) return true;
     return commit(payload, crypto.randomUUID());
   };
@@ -6144,7 +6151,7 @@ const DGJConnection = (() => {
     try {
       const result = await request("/api/users");
       const d = showDialog(
-        `<h2>Team Accounts</h2><p class="smallnote">Team accounts must use @dgjones.com. Account email addresses cannot be changed.</p><div>${result.data.users.map((u) => `<div class="account-row"><div class="grow"><b>${esc(u.name)}</b><small>${esc(u.email)} · ${esc(u.role)} · ${u.enabled ? "Enabled" : "Disabled"}</small></div>${u.id === user.id ? "" : `<button class="secondary compact" data-account-toggle="${esc(u.id)}" data-enabled="${!u.enabled}">${u.enabled ? "Disable" : "Enable"}</button>`}</div>`).join("")}</div><form id="create-account"><h3>Add Account</h3><div class="form-grid">${fieldHTML("Name", "name", "", "text", true)}${fieldHTML("Company Email", "email", "", "email", true, 'pattern="[^@]+@[dD][gG][jJ][oO][nN][eE][sS][.][cC][oO][mM]" placeholder="name@dgjones.com" title="Use an @dgjones.com email address."')}${fieldHTML("Initial Password (12–128 characters)", "password", "", "password", true, 'minlength="12" maxlength="128" autocomplete="new-password"')}${selectHTML("Access", "role", "member", ["member", "manager"])}</div><p class="smallnote">Share initial credentials with the person privately. They can change their password after signing in.</p><div class="formbuttons"><button type="button" class="secondary" data-close>Close</button><button class="primary" type="submit">Create Account</button></div></form>`,
+        `<h2>Team Accounts</h2><p class="smallnote">Team accounts must use @dgjones.com. Account email addresses cannot be changed.</p><div>${result.data.users.map((u) => `<div class="account-row"><div class="grow"><b>${esc(u.name)}</b><small>${esc(u.email)} · ${esc(u.role)} · ${u.enabled ? "Enabled" : "Disabled"}</small></div>${u.id === user.id ? "" : `<label class="smallnote">Role<select data-account-role="${esc(u.id)}" aria-label="Role for ${esc(u.name)}">${["visitor", "member", "manager"].map(role => `<option value="${role}" ${u.role === role ? "selected" : ""}>${role === "visitor" ? "Visitor (read-only)" : role === "manager" ? "Manager" : "Member"}</option>`).join("")}</select></label><button class="secondary compact" data-account-toggle="${esc(u.id)}" data-enabled="${!u.enabled}">${u.enabled ? "Disable" : "Enable"}</button>`}</div>`).join("")}</div><form id="create-account"><h3>Add Account</h3><div class="form-grid">${fieldHTML("Name", "name", "", "text", true)}${fieldHTML("Company Email", "email", "", "email", true, 'pattern="[^@]+@[dD][gG][jJ][oO][nN][eE][sS][.][cC][oO][mM]" placeholder="name@dgjones.com" title="Use an @dgjones.com email address."')}${fieldHTML("Initial Password (12–128 characters)", "password", "", "password", true, 'minlength="12" maxlength="128" autocomplete="new-password"')}${selectHTML("Access", "role", "member", ["visitor", "member", "manager"])}</div><p class="smallnote">Share initial credentials with the person privately. They can change their password after signing in.</p><div class="formbuttons"><button type="button" class="secondary" data-close>Close</button><button class="primary" type="submit">Create Account</button></div></form>`,
       );
       d.classList.add("dialog-wide");
       d.querySelector("form").onsubmit = async (e) => {
@@ -6165,6 +6172,18 @@ const DGJConnection = (() => {
           if (b.isConnected) b.disabled = false;
         }
       };
+      d.querySelectorAll("[data-account-role]").forEach(select => {
+        select.onchange = async () => {
+          select.disabled = true;
+          try {
+            await request("/api/users/" + encodeURIComponent(select.dataset.accountRole) + "/role", {method: "PATCH", body: {role: select.value}});
+            const team = await request("/api/team");
+            USERS.splice(0, USERS.length, ...team.data.users);
+            await accounts();
+            toast("Role updated. The user must sign in again.");
+          } catch (error) {toast(error.message); await accounts();}
+        };
+      });
       d.querySelectorAll("[data-account-toggle]").forEach(
         (b) =>
           (b.onclick = async () => {
@@ -6261,7 +6280,7 @@ const DGJConnection = (() => {
     }
   };
   settings = function () {
-    return `<div class="pageheading"><h1>Settings</h1></div><div class="settings-account"><section class="panel"><h3>Your Account</h3><p>${esc(user.name)} · ${esc(user.email)}</p><p class="smallnote">${isManager() ? "General Manager" : "Team Member"} · Data is stored in the shared CRM database. Your account email address cannot be changed.</p><div class="account-controls"><button class="secondary" id="real-password">Change Password</button>${isManager() ? '<button class="secondary" id="real-accounts">Team Accounts</button><button class="secondary" id="real-backup">Download Backup</button><label class="secondary">Restore CRM Backup<input id="restore" type="file" accept="application/json,.json" hidden></label>' : ""}<button class="secondary" id="real-signout">Sign Out</button></div></section><section class="panel"><h3>Connection</h3><p>Railway · PostgreSQL</p><p class="smallnote">Saved records are available to authorized teammates. Private records are restricted by the server.</p><button class="secondary" id="real-refresh">Refresh Data</button></section></div>`;
+    return `<div class="pageheading"><h1>Settings</h1></div><div class="settings-account"><section class="panel"><h3>Your Account</h3><p>${esc(user.name)} · ${esc(user.email)}</p><p class="smallnote">${isManager() ? "General Manager" : user.role === "visitor" ? "Visitor · Read-only" : "Team Member"} · Data is stored in the shared CRM database. Your account email address cannot be changed.</p><div class="account-controls"><button class="secondary" id="real-password">Change Password</button>${isManager() ? '<button class="secondary" id="real-accounts">Team Accounts</button><button class="secondary" id="real-backup">Download Backup</button><label class="secondary">Restore CRM Backup<input id="restore" type="file" accept="application/json,.json" hidden></label>' : ""}<button class="secondary" id="real-signout">Sign Out</button></div></section><section class="panel"><h3>Connection</h3><p>Railway · PostgreSQL</p><p class="smallnote">Saved records are available to authorized teammates. Private records are restricted by the server.</p><button class="secondary" id="real-refresh">Refresh Data</button></section></div>`;
   };
   document.getElementById("login-form").onsubmit = signIn;
   document.addEventListener("click", async (e) => {
@@ -6471,6 +6490,92 @@ const DGJMicrosoft = (() => {
     scheduleMeeting(button.dataset.prepareTeams);
   }, true);
   return { scheduleMeeting };
+})();
+
+/* Visitor presentation. Server permissions remain authoritative. */
+(() => {
+  const visitor = () => window.DGJSession.ready && user.role === "visitor";
+  const mutationSelector = [
+    "[data-new]", "[data-delete]", "[data-restore]", "[data-purge]", "[data-profile-new]",
+    "[data-action-new]", "[data-action-log]", "[data-link-contact-opportunity]", "[data-link-company]",
+    "[data-edit-company]", "[data-manage-contacts]", "[data-add-note]", "[data-edit-note]", "[data-delete-note]",
+    "[data-add-file]", "[data-delete-file]", "[data-employment-edit]", "[data-meeting-task]",
+    "[data-email]", "[data-coordinate]", "[data-open-draft]", "[data-prepare-teams]", "[data-undo-trash]",
+    "#add", "#addmenu", "#addemployment", "#logcommunication", "#manage-contacts", "#ui-import",
+    "#ui-import-save", "#ui-import-card", "#ui-import-data", "#ui-import-template", "#ui-merge-save",
+    "#ui-duplicate-new", "#ui-stage-confirm", "#ui-report-action", "#ui-upload-file", "#ui-delete-supplement",
+    "#real-accounts", "#real-backup", "#confirmrestore", "#confirmreset", "[data-report-export]", "#export"
+  ].join(",");
+  function details(kind, id) {
+    const record = visibleRecord(kind, id);
+    if (!record) return toast("Record is not available.");
+    if (["Contacts", "Opportunities"].includes(kind)) {
+      closeDialog(); activeProfile = {type: kind, id}; page = kind; render(); return;
+    }
+    if (kind === "Meetings") return meetingDetail(id);
+    if (kind === "Reports") return reportDetail(id);
+    const fields = ["company", "status", "date", "priority", "details", "notes", "resolution"];
+    showDialog(`${dialogTitle("View " + singular(kind), "Visitor · Read-only")}<h2>${esc(record.name)}</h2><dl class="detail-grid">${fields.filter(key => record[key]).map(key => `<div><dt>${esc(key.charAt(0).toUpperCase() + key.slice(1))}</dt><dd>${esc(record[key])}</dd></div>`).join("")}</dl><div class="formbuttons"><button class="secondary" data-close>Close</button></div>`);
+  }
+  function decorate(root = document) {
+    if (!visitor()) return;
+    root.querySelectorAll(mutationSelector).forEach(el => { if (!el.hidden) el.hidden = true; });
+    root.querySelectorAll("[data-check],[data-change-stage]").forEach(el => { el.disabled = true; });
+    root.querySelectorAll('[draggable="true"]').forEach(el => el.setAttribute("draggable", "false"));
+    root.querySelectorAll("[data-meeting-report]").forEach(el => {
+      const meeting = visibleRecord("Meetings", el.dataset.meetingReport);
+      if (!meeting || !meetingReport(meeting)) el.hidden = true;
+    });
+    root.querySelectorAll("[data-edit]").forEach(el => {
+      const kind = el.dataset.edit, id = el.dataset.id;
+      if (/^(edit|manage|update)\b/i.test(el.textContent.trim())) el.hidden = true;
+      else { el.dataset.visitorDetail = kind; el.dataset.id = id; el.removeAttribute("data-edit"); }
+    });
+    root.querySelectorAll("form").forEach(form => {
+      if (!["login-form", "change-password", "save-view-form"].includes(form.id)) {
+        form.querySelectorAll("input,textarea,select,button[type=submit]").forEach(el => { el.disabled = true; });
+      }
+    });
+  }
+  const originalRender = render;
+  render = function () {
+    originalRender();
+    document.body.classList.toggle("visitor-read-only", visitor());
+    if (visitor()) {
+      const banner = document.createElement("p"); banner.className = "notice"; banner.id = "visitor-banner";
+      banner.textContent = "Visitor · Read-only access. You can search, filter and view permitted records.";
+      document.getElementById("main").prepend(banner); decorate();
+    }
+  };
+  const originalDialog = showDialog;
+  showDialog = function (html) { const dialog = originalDialog(html); decorate(dialog); return dialog; };
+  const originalForm = openForm;
+  openForm = function (kind, id, ...args) {
+    if (visitor()) return id ? details(kind, id) : toast("Visitor accounts can view records only.");
+    return originalForm(kind, id, ...args);
+  };
+  const originalHelp = help;
+  help = function () {
+    return visitor() ? '<h1>Help & Support</h1><section class="panel"><h3>Visitor access</h3><p>You can browse, search and filter permitted shared records, view profiles, meetings, reports, notes and files. Private records remain restricted.</p><p>Visitors cannot create, edit or delete CRM records, manage accounts, or export CRM data. Ask your manager if you need a different role.</p></section>' : originalHelp();
+  };
+  document.addEventListener("click", event => {
+    if (!visitor()) return;
+    const target = event.target.closest("button,input,label,a");
+    if (!target) return;
+    const detail = target.closest("[data-visitor-detail]");
+    if (detail) { event.preventDefault(); event.stopImmediatePropagation(); details(detail.dataset.visitorDetail, detail.dataset.id); return; }
+    if (target.closest(mutationSelector) || target.matches("[data-check],[data-change-stage]")) {
+      event.preventDefault(); event.stopImmediatePropagation(); toast("Visitor accounts can view records only.");
+    }
+  }, true);
+  document.addEventListener("submit", event => {
+    if (visitor() && !["change-password", "save-view-form", "login-form"].includes(event.target.id)) {
+      event.preventDefault(); event.stopImmediatePropagation(); toast("Visitor accounts can view records only.");
+    }
+  }, true);
+  const observer = new MutationObserver(() => { if (visitor()) decorate(); });
+  observer.observe(document.getElementById("main"), {childList: true, subtree: true});
+  observer.observe(document.getElementById("modal"), {childList: true, subtree: true});
 })();
 
 </script>
