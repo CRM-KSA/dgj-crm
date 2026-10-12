@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-H9+K5Df8OpmOnDYhfpDgey9EHVtgXw6oMW6y+lSbI9U=' 'sha256-hko3HgQ+VOeQi47Zt350egvnxNDVZyhXyhLnJziweaM=' 'sha256-79AUgvtfYbL4N665Oy58ao/YZzcDTkl+fD2qVK/FO2g=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-5/ckqcrqiAFkrM7D86qIV9Gp3H93345M37GKS/oIKCw=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-H9+K5Df8OpmOnDYhfpDgey9EHVtgXw6oMW6y+lSbI9U=' 'sha256-eMXR71ergCAhKAxd5HyxPmuyk/2I3LFFGNuQ/kxuM50=' 'sha256-79AUgvtfYbL4N665Oy58ao/YZzcDTkl+fD2qVK/FO2g=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-5/ckqcrqiAFkrM7D86qIV9Gp3H93345M37GKS/oIKCw=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="DGJ CRM: contacts, opportunities, meetings, reports and connected follow-ups.">
   <title>DGJ | CRM</title>
@@ -4148,13 +4148,14 @@ function bookingForm(id, suggested = {}) {
     status: "Scheduled",
     reportRequired: true,
     meetingType: "Opportunity",
+    personnelIds: [user.id],
     contactIds: [],
     opportunityId: "",
     ...old,
     ...suggested,
   };
   const d = showDialog(
-    `<form id="booking-form">${dialogTitle(id ? "Edit Meeting" : "Schedule Meeting", "Plan the meeting and link the people and opportunity involved.")}<div class="form-grid">${fieldHTML("Meeting Title", "name", x.name, "text", true)}${selectHTML("Meeting Type", "meetingType", x.meetingType, ["Opportunity", "Contact Only", "Internal"])}${fieldHTML("Date", "date", x.date, "date", true)}${fieldHTML("Location / Platform", "company", x.company, "text", true)}${fieldHTML("Start Time (Riyadh)", "time", x.time, "time", true)}${fieldHTML("End Time (Riyadh)", "end", x.end, "time", true)}<div class="span-two">${fieldHTML("Teams / Meeting Link", "url", x.url, "url")}</div>${selectHTML("Status", "status", x.status, statuses.Meetings)}${fieldHTML("External Attendees", "externalAttendees", x.externalAttendees, "text")}</div>${linkFields("Meetings", x)}<label class="formfield"><input type="checkbox" name="reportRequired" ${x.reportRequired !== false ? "checked" : ""} style="display:inline;width:auto"> Meeting report required</label>${textareaHTML("Agenda / Notes", "notes", x.notes)}<div id="booking-conflicts"></div><div class="formbuttons"><button type="button" class="secondary" data-close>Cancel</button><button class="primary" type="submit">${id ? "Save Changes" : "Schedule Meeting"}</button></div></form>`,
+    `<form id="booking-form">${dialogTitle(id ? "Edit Meeting" : "Schedule Meeting", "Plan the meeting and link the people and opportunity involved.")}<div class="form-grid">${fieldHTML("Meeting Title", "name", x.name, "text", true)}${selectHTML("Meeting Type", "meetingType", x.meetingType, ["Opportunity", "Contact Only", "Internal"])}${fieldHTML("Date", "date", x.date, "date", true)}${fieldHTML("Location / Platform", "company", x.company, "text", true)}${fieldHTML("Start Time (Riyadh)", "time", x.time, "time", true)}${fieldHTML("End Time (Riyadh)", "end", x.end, "time", true)}<div class="span-two">${fieldHTML("Teams / Meeting Link", "url", x.url, "url")}</div>${selectHTML("Status", "status", x.status, statuses.Meetings)}${fieldHTML("External Attendees", "externalAttendees", x.externalAttendees, "text")}</div>${linkFields("Meetings", x)}<fieldset class="visibility"><legend>DGJ Personnel</legend><p class="smallnote">Selected team members receive the new meeting email.</p>${USERS.map(u => `<label><input type="checkbox" name="personnelIds" value="${esc(u.id)}" ${(x.personnelIds || []).includes(u.id) ? "checked" : ""}> ${esc(u.name)}</label>`).join("")}</fieldset><label class="formfield"><input type="checkbox" name="reportRequired" ${x.reportRequired !== false ? "checked" : ""} style="display:inline;width:auto"> Meeting report required</label>${textareaHTML("Agenda / Notes", "notes", x.notes)}<div id="booking-conflicts"></div><div class="formbuttons"><button type="button" class="secondary" data-close>Cancel</button><button class="primary" type="submit">${id ? "Save Changes" : "Schedule Meeting"}</button></div></form>`,
   );
   d.classList.add("dialog-wide");
   let acknowledged = "";
@@ -4163,8 +4164,10 @@ function bookingForm(id, suggested = {}) {
     const fd = new FormData(e.target),
       v = Object.fromEntries(fd);
     v.contactIds = fd.getAll("contactIds");
+    v.personnelIds = fd.getAll("personnelIds");
     v.reportRequired = fd.has("reportRequired");
     v.opportunityId = fd.get("opportunityId") || "";
+    if (!v.personnelIds.length) return toast("Select at least one DGJ team member.");
     if (v.end <= v.time) return toast("End time must be after start time.");
     if (v.url && !safeHTTPS(v.url))
       return toast("Use a valid HTTPS meeting link.");
@@ -4180,9 +4183,10 @@ function bookingForm(id, suggested = {}) {
         m.time < v.end &&
         m.end > v.time &&
         (m.ownerId === (old?.ownerId || user.id) ||
-          m.contactIds?.some((c) => v.contactIds.includes(c))),
+          m.contactIds?.some((c) => v.contactIds.includes(c)) ||
+          m.personnelIds?.some((person) => v.personnelIds.includes(person))),
     );
-    const signature = JSON.stringify([v.date, v.time, v.end, v.contactIds]);
+    const signature = JSON.stringify([v.date, v.time, v.end, v.contactIds, v.personnelIds]);
     if (conflicts.length && acknowledged !== signature) {
       acknowledged = signature;
       d.querySelector("#booking-conflicts").innerHTML =
@@ -4216,7 +4220,7 @@ function meetingDetail(id) {
     opp = visibleRecord("Opportunities", m.opportunityId);
   detailRecord = { type: "Meetings", id };
   const d = showDialog(
-    `${dialogTitle("Meeting Details")}<h2>${esc(m.name)}</h2><p class="dialog-subtitle">${dateLabel(m.date)} · ${timeLabel(m.time)} – ${timeLabel(m.end)} · ${esc(m.company)}</p><div class="detail-badges"><span>Meeting ${pillHTML(m.status)}</span><span>Report ${pillHTML(meetingReportState(m))}</span></div><div class="detail-actions"><button class="secondary" data-edit="Meetings" data-id="${esc(id)}">${icon("Edit")} Edit Meeting</button>${m.url ? `<button class="primary" data-join="${esc(id)}">Join Meeting</button>` : ""}<button class="secondary" data-ics="${esc(id)}">${icon("Meetings")} Add to Calendar</button>${report ? `<button class="primary" data-report-detail="${esc(report.id)}">View Report</button>` : m.status !== "Cancelled" && m.reportRequired !== false ? `<button class="primary" data-meeting-report="${esc(id)}">＋ Add Report</button>` : ""}</div><div class="detail-section"><h3>Attendees (${contacts.length})</h3><div class="attendee-people">${contacts.map((c) => `<span>${avatarHTML(c)}${profileLink("Contacts", c.id, c.name)}</span>`).join("") || '<span class="muted">No contact attendees linked.</span>'}${m.externalAttendees ? `<span>${esc(m.externalAttendees)}</span>` : ""}</div></div><div class="detail-section"><h3>Linked To</h3>${opp ? `<div class="record-card"><span>${icon("Opportunities")}</span><div>${profileLink("Opportunities", opp.id, opp.name)}<small>${esc(opp.company)} · ${esc(opp.status)}</small></div></div>` : contacts.length ? '<span class="pill">Contact Only</span>' : '<span class="muted">No linked opportunity.</span>'}</div><div class="detail-section"><h3>Agenda / Notes</h3><p>${esc(m.notes || "No agenda recorded.")}</p></div><div class="detail-section"><h3>Next Steps (${tasks.length})</h3>${tasks.map((t) => `<div class="row"><input type="checkbox" data-check="${esc(t.id)}" ${t.status === "Completed" ? "checked" : ""} aria-label="Complete ${esc(t.name)}"><button class="grow" style="text-align:left" data-edit="Tasks" data-id="${esc(t.id)}">${esc(t.name)}</button><span class="${taskStatus(t) === "Overdue" ? "dangertext" : ""}">${dateLabel(t.date)}</span>${ownerHTML(t.assigneeId || t.ownerId)}</div>`).join("") || emptyHTML("Report actions will appear here.")}<button class="secondary compact" data-meeting-task="${esc(id)}">＋ Add Follow-up Task</button></div><div class="detail-section"><h3>Activity Timeline</h3>${
+    `${dialogTitle("Meeting Details")}<h2>${esc(m.name)}</h2><p class="dialog-subtitle">${dateLabel(m.date)} · ${timeLabel(m.time)} – ${timeLabel(m.end)} · ${esc(m.company)}</p><div class="detail-badges"><span>Meeting ${pillHTML(m.status)}</span><span>Report ${pillHTML(meetingReportState(m))}</span></div><div class="detail-actions"><button class="secondary" data-edit="Meetings" data-id="${esc(id)}">${icon("Edit")} Edit Meeting</button>${m.url ? `<button class="primary" data-join="${esc(id)}">Join Meeting</button>` : ""}<button class="secondary" data-ics="${esc(id)}">${icon("Meetings")} Add to Calendar</button>${report ? `<button class="primary" data-report-detail="${esc(report.id)}">View Report</button>` : m.status !== "Cancelled" && m.reportRequired !== false ? `<button class="primary" data-meeting-report="${esc(id)}">＋ Add Report</button>` : ""}</div><div class="detail-section"><h3>DGJ Personnel</h3><p>${(m.personnelIds || []).map(id => esc(userName(id))).join(", ") || "Not specified"}</p></div><div class="detail-section"><h3>Attendees (${contacts.length})</h3><div class="attendee-people">${contacts.map((c) => `<span>${avatarHTML(c)}${profileLink("Contacts", c.id, c.name)}</span>`).join("") || '<span class="muted">No contact attendees linked.</span>'}${m.externalAttendees ? `<span>${esc(m.externalAttendees)}</span>` : ""}</div></div><div class="detail-section"><h3>Linked To</h3>${opp ? `<div class="record-card"><span>${icon("Opportunities")}</span><div>${profileLink("Opportunities", opp.id, opp.name)}<small>${esc(opp.company)} · ${esc(opp.status)}</small></div></div>` : contacts.length ? '<span class="pill">Contact Only</span>' : '<span class="muted">No linked opportunity.</span>'}</div><div class="detail-section"><h3>Agenda / Notes</h3><p>${esc(m.notes || "No agenda recorded.")}</p></div><div class="detail-section"><h3>Next Steps (${tasks.length})</h3>${tasks.map((t) => `<div class="row"><input type="checkbox" data-check="${esc(t.id)}" ${t.status === "Completed" ? "checked" : ""} aria-label="Complete ${esc(t.name)}"><button class="grow" style="text-align:left" data-edit="Tasks" data-id="${esc(t.id)}">${esc(t.name)}</button><span class="${taskStatus(t) === "Overdue" ? "dangertext" : ""}">${dateLabel(t.date)}</span>${ownerHTML(t.assigneeId || t.ownerId)}</div>`).join("") || emptyHTML("Report actions will appear here.")}<button class="secondary compact" data-meeting-task="${esc(id)}">＋ Add Follow-up Task</button></div><div class="detail-section"><h3>Activity Timeline</h3>${
       db.activity
         .filter(
           (a) =>
