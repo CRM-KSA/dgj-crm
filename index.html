@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-KHVmypOCXtIcUpAkSQ9WNFr09bpN3QQ3GhroNGmbtV0=' 'sha256-bvfh0IwcXlH7dRPmny5BZ7GPW4nn6z1LP6Er8ByIIxA=' 'sha256-8y/fw4umvE5nV2bmHLphY5wdxOD+Kqk6R5MsLh7E2NY=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-MaaGh8sTvOmgjinGW0t66h/0Ts3xX3L5BFDfAiZU4DU=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg=' 'sha256-4i/WRZneMMoClM5rfZwCxTHJSjHOYZo3IUkrSYEtAlo='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-KHVmypOCXtIcUpAkSQ9WNFr09bpN3QQ3GhroNGmbtV0=' 'sha256-bvfh0IwcXlH7dRPmny5BZ7GPW4nn6z1LP6Er8ByIIxA=' 'sha256-8y/fw4umvE5nV2bmHLphY5wdxOD+Kqk6R5MsLh7E2NY=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-MaaGh8sTvOmgjinGW0t66h/0Ts3xX3L5BFDfAiZU4DU=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg=' 'sha256-/tJjLdC8X+2L1525nUrMX5Ub27VzTm6gjaI7MP1+e30='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="DGJ CRM: contacts, opportunities, meetings, reports and connected follow-ups.">
   <title>DGJ | CRM</title>
@@ -141,6 +141,19 @@ header>.dgj-wordmark{flex-shrink:0}header #search{min-width:80px;flex:1;max-widt
 @media(max-width:850px){.photo-inspiration.integrated-inspiration{padding:17px;gap:14px}.integrated-inspiration .inspiration-copy h2{font-size:21px}}
 @media(max-width:650px){.contacts-analytics.with-integrated-gallery,.reports-analytics.with-integrated-gallery,.analytics-grid.two.with-integrated-gallery{grid-template-columns:1fr}.analytics-grid.two.with-integrated-gallery>.integrated-inspiration{grid-column:auto;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}.photo-inspiration.integrated-inspiration{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);min-height:200px}.photo-inspiration.in-panel-inspiration{grid-template-columns:minmax(0,1fr) minmax(90px,135px);min-height:0;padding:18px 15px;gap:16px}.in-panel-inspiration .inspiration-copy h2{font-size:20px}.integrated-inspiration .inspiration-place{font-size:9px;letter-spacing:.8px}.integrated-inspiration .inspiration-photo{max-height:150px}.home-inspiration.integrated-inspiration{padding:12px}}
 @media(max-width:380px){.photo-inspiration.integrated-inspiration{gap:10px;padding:14px}.integrated-inspiration .inspiration-copy h2{font-size:19px}.integrated-inspiration .inspiration-copy p{font-size:11px}}
+
+/* The photograph occupies its own half of the card, flush with the outer edge. */
+.photo-inspiration.integrated-inspiration{padding:0;gap:0;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border:0;border-radius:10px;overflow:hidden;background:#f5f0e7;box-shadow:inset 0 0 0 1px #e7dfd0}
+.photo-inspiration.integrated-inspiration .inspiration-copy{padding:23px 22px;align-self:center}
+.photo-inspiration.integrated-inspiration .inspiration-visual{align-self:stretch;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;background:#e8dfcf;border-left:1px solid #dfd4c1;border-radius:0 10px 10px 0}
+.photo-inspiration.integrated-inspiration .inspiration-photo{display:block;width:100%;height:auto;max-width:100%;max-height:none;object-fit:contain;border-radius:0;flex:none}
+.photo-inspiration.integrated-inspiration .photo-attribution{width:100%;margin:0;padding:8px 7px;font-size:8px;line-height:1.5;background:#eee6d8;color:#82765f;overflow-wrap:anywhere}
+.meeting-side>.photo-inspiration.integrated-inspiration,.task-side>.photo-inspiration.integrated-inspiration{padding:0;gap:0;grid-template-columns:1fr 1fr;min-height:220px}
+.photo-inspiration.in-panel-inspiration{padding:0;grid-template-columns:minmax(0,1fr) minmax(130px,32%);border-radius:8px;margin-top:18px;box-shadow:inset 0 0 0 1px #e7dfd0}
+.photo-inspiration.in-panel-inspiration .inspiration-copy{padding:24px 28px}.photo-inspiration.in-panel-inspiration .inspiration-photo{max-height:220px;width:100%;height:auto;object-fit:contain}
+@media(max-width:1150px){.analytics-grid.two.with-integrated-gallery>.photo-inspiration.integrated-inspiration{grid-template-columns:1fr 1fr}.analytics-grid.two.with-integrated-gallery>.photo-inspiration.integrated-inspiration .inspiration-photo{max-height:none}}
+@media(max-width:650px){.photo-inspiration.integrated-inspiration,.analytics-grid.two.with-integrated-gallery>.photo-inspiration.integrated-inspiration{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.photo-inspiration.integrated-inspiration .inspiration-copy{padding:20px 17px}.photo-inspiration.in-panel-inspiration{grid-template-columns:minmax(0,1fr) minmax(0,40%)}.photo-inspiration.in-panel-inspiration .inspiration-copy{padding:20px 17px}.photo-inspiration.integrated-inspiration .inspiration-copy h2{font-size:21px}.photo-inspiration.integrated-inspiration .inspiration-place{letter-spacing:.65px;font-size:9px}}
+@media(max-width:380px){.photo-inspiration.integrated-inspiration .inspiration-copy{padding:18px 14px}.photo-inspiration.integrated-inspiration .inspiration-copy h2{font-size:19px}}
 
 </style>
 </head>
@@ -6906,7 +6919,7 @@ logsHTML=function(){const shell=document.createElement('div');shell.innerHTML=ed
 const editorialRender=render;
 render=function(){
  editorialRender();if(!window.DGJSession.ready)return;
- const main=document.getElementById('main');placeInspiration(main);
+ const main=document.getElementById('main');main.querySelectorAll('.quote-card').forEach(el=>el.remove());placeInspiration(main);
  main.querySelectorAll('img.banner').forEach(el=>el.remove());
  const quote=main.querySelector('.quote');if(quote)quote.innerHTML='People lead.<br>Progress follows.';
 };
