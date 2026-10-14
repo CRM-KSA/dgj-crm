@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jOnulvUWYXsXwXPGheSwnmDkFQw/FSdnUybMcjT4zOE=' 'sha256-KHVmypOCXtIcUpAkSQ9WNFr09bpN3QQ3GhroNGmbtV0=' 'sha256-bvfh0IwcXlH7dRPmny5BZ7GPW4nn6z1LP6Er8ByIIxA=' 'sha256-8y/fw4umvE5nV2bmHLphY5wdxOD+Kqk6R5MsLh7E2NY=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-MaaGh8sTvOmgjinGW0t66h/0Ts3xX3L5BFDfAiZU4DU=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg=' 'sha256-hi0wUGwW284VyYjaj+MawxmT3ZyENQYjB+wMc936IqQ='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/pAbxUKnmUkmH0KvJGyYWg4QpvU34w31+OtusTaGwlM=' 'sha256-KHVmypOCXtIcUpAkSQ9WNFr09bpN3QQ3GhroNGmbtV0=' 'sha256-bvfh0IwcXlH7dRPmny5BZ7GPW4nn6z1LP6Er8ByIIxA=' 'sha256-8y/fw4umvE5nV2bmHLphY5wdxOD+Kqk6R5MsLh7E2NY=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-EruNH91p4aG39FjT8VjnrDbHebSV3EczqcisU6VM8oY=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg=' 'sha256-hi0wUGwW284VyYjaj+MawxmT3ZyENQYjB+wMc936IqQ='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="DGJ CRM: contacts, opportunities, meetings, reports and connected follow-ups.">
   <title>DGJ | CRM</title>
@@ -202,6 +202,8 @@ header>.dgj-wordmark{flex-shrink:0}header #search{min-width:80px;flex:1;max-widt
 .photo-credits{margin:24px 0 0;color:#887c68;font:11px/1.7 Arial,sans-serif}.photo-credits summary{cursor:pointer}.photo-credits li{margin:7px 0}.photo-credits a{color:inherit}
 @media(max-width:650px){.photo-inspiration.integrated-inspiration.photo-led,.photo-inspiration.integrated-inspiration.photo-led.contacts-photo-card{height:155px!important}.photo-led .inspiration-copy{padding:20px!important}.photo-led .inspiration-copy h2{font-size:21px!important;max-width:75%!important}}
 
+#session-recovery p{font:13px/1.65 Arial,sans-serif;color:#776b57}#session-recovery .secondary{display:block;width:100%;margin-top:10px}#session-recovery[hidden],#login-form[hidden]{display:none!important}
+
 </style>
 </head>
 <body class="signed-out">
@@ -213,7 +215,8 @@ header>.dgj-wordmark{flex-shrink:0}header #search{min-width:80px;flex:1;max-widt
   <dialog id="modal" aria-label="CRM dialog"></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <script>
-// Public service address only. Credentials and signed sessions stay in tab memory.
+// Public service address only. Signed sessions persist in sessionStorage for this tab.
+// No password or CRM records are stored there; the backend validates every session.
 window.DGJ_CONFIG = window.DGJ_CONFIG || {
   apiBase: "https://dgj-crm-backend-production-6732.up.railway.app",
 };
@@ -5971,6 +5974,36 @@ const DGJConnection = (() => {
     "emailDrafts",
     "activity",
   ];
+  const sessionKey = 'dgj-crm-tab-session-v1';
+  const allowedPages = new Set(['Home','Contacts','Opportunities','Meetings','Tasks','Reports','Complaints','Trash','Logs','Settings','Help & Support','Search']);
+  let tabExpiresAt = 0;
+  function readTabSession(){
+    try {const saved=JSON.parse(sessionStorage.getItem(sessionKey)||'null');
+      if(saved&&typeof saved.token==='string'&&saved.token.length<10000&&saved.token.includes('.')&&Number.isFinite(saved.expiresAt)&&saved.expiresAt>Date.now())return saved;
+      sessionStorage.removeItem(sessionKey);
+    } catch {try{sessionStorage.removeItem(sessionKey);}catch{}}
+    return null;
+  }
+  function saveTabSession(){
+    if(!session.token||!tabExpiresAt)return;
+    try{sessionStorage.setItem(sessionKey,JSON.stringify({token:session.token,expiresAt:tabExpiresAt,page:allowedPages.has(page)?page:'Home'}));}catch{}
+  }
+  function forgetTabSession(){try{sessionStorage.removeItem(sessionKey);}catch{}}
+  const beforeSessionGo=go;
+  go=function(next){beforeSessionGo(next);if(session.ready)saveTabSession();};
+  function recoveryUI(message){
+    session.restoring=true;session.ready=false;
+    document.body.classList.add('signed-out');
+    document.getElementById('login-shell').hidden=false;
+    document.getElementById('login-form').hidden=true;
+    let box=document.getElementById('session-recovery');
+    if(!box){box=document.createElement('div');box.id='session-recovery';box.innerHTML='<p role="status" id="session-recovery-message"></p><button type="button" class="primary" data-session-retry>Retry connection</button><button type="button" class="secondary" data-session-forget>Use another account</button>';document.getElementById('login-form').after(box);}
+    box.hidden=false;box.querySelector('p').textContent=message;
+  }
+  function clearRecoveryUI(){
+    document.getElementById('login-form').hidden=false;
+    const box=document.getElementById('session-recovery');if(box)box.hidden=true;
+  }
   const metadata = [
     "id",
     "entityType",
@@ -6026,7 +6059,9 @@ const DGJConnection = (() => {
     db = normalizeDB(state);
     setStatus("Connected · Refresh");
   }
-  function clearSession(message = "") {
+  function clearSession(message = "", {keepStored=false} = {}) {
+    if(!keepStored){forgetTabSession();tabExpiresAt=0;}
+    session.restoring=false;clearRecoveryUI();
     session.epoch++;
     session.ready = false;
     document.body.classList.remove("visitor-read-only");
@@ -6103,9 +6138,11 @@ const DGJConnection = (() => {
           "Unable to complete this request.",
       );
       error.status = res.status;
+      error.retryAfter = res.headers.get("retry-after");
+      if(res.status===429)error.message="Too many requests. Please wait a few minutes before trying again.";
       error.code = data.error?.code || data.code;
       if (
-        session.ready &&
+        (session.ready || session.restoring) &&
         (res.status === 401 || error.code === "ACCOUNT_DISABLED")
       )
         clearSession("Your session ended. Sign in again.");
@@ -6279,6 +6316,44 @@ const DGJConnection = (() => {
     change(next);
     return persist(next);
   };
+  async function hydrateSession(desiredPage){
+    const [me, team, state] = await Promise.all([
+      request("/api/me"),
+      request("/api/team"),
+      request("/api/workspace"),
+    ]);
+    user = me.data.user;
+    USERS.splice(
+      0,
+      USERS.length,
+      ...team.data.users.map((u) => ({
+        ...u,
+        initials: u.name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase(),
+      })),
+    );
+    if (!USERS.some((u) => u.id === user.id)) USERS.push({ ...user });
+    apply(state.data.state);
+    const target=allowedPages.has(desiredPage)?desiredPage:'Home';
+    page=(!['Trash','Logs'].includes(target)||isManager())?target:'Home';
+    session.ready = true;session.restoring=false;clearRecoveryUI();saveTabSession();
+  }
+  async function restoreTabSession(){
+    const saved=readTabSession();if(!saved){clearSession();return false;}
+    session.epoch++;session.token=saved.token;tabExpiresAt=saved.expiresAt;
+    recoveryUI('Restoring your session…');
+    const button=document.querySelector('[data-session-retry]');button.disabled=true;
+    try{await hydrateSession(saved.page);document.body.classList.remove('signed-out');document.getElementById('login-shell').hidden=true;render();return true;}
+    catch(error){if(error.sessionChanged)return false;
+      if(error.status===401||error.code==='ACCOUNT_DISABLED'){clearSession('Your session ended. Sign in again.');}
+      else recoveryUI(error.message+' Your saved session has been kept.');return false;
+    }finally{button.disabled=false;}
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-session-retry'))void restoreTabSession();if(b.hasAttribute('data-session-forget')){if(session.token)void signOut();else clearSession();}});
   async function signIn(event) {
     event.preventDefault();
     const form = event.target,
@@ -6298,34 +6373,16 @@ const DGJConnection = (() => {
       if (!response.token)
         throw new Error("A signed session was not returned.");
       session.token = response.token;
-      const [me, team, state] = await Promise.all([
-        request("/api/me"),
-        request("/api/team"),
-        request("/api/workspace"),
-      ]);
-      user = me.data.user;
-      USERS.splice(
-        0,
-        USERS.length,
-        ...team.data.users.map((u) => ({
-          ...u,
-          initials: u.name
-            .split(/\s+/)
-            .slice(0, 2)
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase(),
-        })),
-      );
-      if (!USERS.some((u) => u.id === user.id)) USERS.push({ ...user });
-      apply(state.data.state);
-      session.ready = true;
+      tabExpiresAt=Date.now()+8*60*60*1000;saveTabSession();
+      session.restoring=true;
+      await hydrateSession('Home');
       form.reset();
       document.body.classList.remove("signed-out");
       document.getElementById("login-shell").hidden = true;
       render();
     } catch (error) {
-      clearSession(error.message);
+      if(session.token && error.status!==401 && error.code!=='ACCOUNT_DISABLED')recoveryUI(error.message+' Your saved session has been kept.');
+      else clearSession(error.message);
     } finally {
       button.disabled = false;
     }
@@ -6419,7 +6476,7 @@ const DGJConnection = (() => {
             revokeOtherSessions: true,
           },
         });
-        if (response.token) session.token = response.token;
+        if (response.token) {session.token = response.token;saveTabSession();}
         closeDialog();
         toast("Password changed. Other sessions were signed out.");
       } catch (error) {
@@ -6509,8 +6566,10 @@ const DGJConnection = (() => {
     )
       refresh();
   }, 45000);
-  clearSession();
-  return { request, refresh, clearSession, signOut };
+  const savedAtStartup=readTabSession();
+  clearSession('',{keepStored:Boolean(savedAtStartup)});
+  if(savedAtStartup)void restoreTabSession();
+  return { request, refresh, clearSession, signOut, restoreTabSession };
 })();
 
 </script>
