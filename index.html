@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/pAbxUKnmUkmH0KvJGyYWg4QpvU34w31+OtusTaGwlM=' 'sha256-KHVmypOCXtIcUpAkSQ9WNFr09bpN3QQ3GhroNGmbtV0=' 'sha256-bvfh0IwcXlH7dRPmny5BZ7GPW4nn6z1LP6Er8ByIIxA=' 'sha256-8y/fw4umvE5nV2bmHLphY5wdxOD+Kqk6R5MsLh7E2NY=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-EruNH91p4aG39FjT8VjnrDbHebSV3EczqcisU6VM8oY=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg=' 'sha256-P4Zp5SjWSKzj8llXfWxijcSCFO+CAjNfo94DLtsfMm0='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/pAbxUKnmUkmH0KvJGyYWg4QpvU34w31+OtusTaGwlM=' 'sha256-Axa+OCRhT7m+m5KrT9b8WnzaCmI18Kfos8g9wJWxbI4=' 'sha256-bvfh0IwcXlH7dRPmny5BZ7GPW4nn6z1LP6Er8ByIIxA=' 'sha256-8y/fw4umvE5nV2bmHLphY5wdxOD+Kqk6R5MsLh7E2NY=' 'sha256-g9weFTZATnPxiZeLyeJPoYWorp+XrDU2Sq6gxrACHwU=' 'sha256-EruNH91p4aG39FjT8VjnrDbHebSV3EczqcisU6VM8oY=' 'sha256-DYyfvVoNPBnRfUtNTOPJ+4pinT/Ynx2LxMUVM+NYjrg=' 'sha256-YijRI5akHbKh18JxKKKZWXZgto9DtaTZRUvqSAxgGWw='; style-src 'unsafe-inline'; img-src data:; connect-src https://dgj-crm-backend-production-6732.up.railway.app; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="DGJ CRM: contacts, opportunities, meetings, reports and connected follow-ups.">
   <title>DGJ | CRM</title>
@@ -245,6 +245,22 @@ header>.dgj-wordmark{flex-shrink:0}header #search{min-width:80px;flex:1;max-widt
 .reports-analytics.with-integrated-gallery>.photo-inspiration.native-photo{height:100%!important;width:auto!important;max-width:100%!important;aspect-ratio:3 / 2!important;align-self:stretch!important;justify-self:center!important}
 @media(max-width:650px){.reports-analytics.with-integrated-gallery>.photo-inspiration.native-photo{height:auto!important;width:min(100%,300px)!important;max-width:300px!important;align-self:start!important}}
 
+/* Photographs join the page's heading or a relevant insight row. */
+.editorial-heading-row{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:28px;align-items:center;margin:0 0 18px}
+.editorial-heading-row>.page-heading,.editorial-heading-row>.pageheading,.editorial-heading-row>.welcome{margin:0!important;min-width:0}
+.editorial-heading-row>.photo-inspiration.native-photo.heading-photograph{width:270px!important;max-width:270px!important;height:180px!important;min-height:0!important;aspect-ratio:3 / 2!important;margin:0!important;align-self:center!important;justify-self:end!important}
+.editorial-heading-row .photo-led .inspiration-copy{padding:17px!important}.editorial-heading-row .photo-led .inspiration-copy h2{font-size:19px!important;max-width:100%!important}
+.reports-analytics.organized-report-insights{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch}
+.report-insight-row{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:stretch}
+.report-insight-row>.workspace-panel{min-width:0;margin:0!important;min-height:220px!important;height:100%!important;box-sizing:border-box}
+.report-insight-row>.photo-inspiration.native-photo{width:330px!important;max-width:330px!important;height:220px!important;min-height:0!important;aspect-ratio:3 / 2!important;margin:0!important;align-self:start!important;justify-self:end!important}
+@media(max-width:850px){.editorial-heading-row{grid-template-columns:minmax(0,1fr) 240px;gap:20px}.editorial-heading-row>.photo-inspiration.native-photo.heading-photograph{width:240px!important;max-width:240px!important;height:160px!important}.report-insight-row{grid-template-columns:minmax(0,1fr) 300px}.report-insight-row>.photo-inspiration.native-photo{width:300px!important;max-width:300px!important;height:200px!important}}
+@media(max-width:650px){.editorial-heading-row{grid-template-columns:1fr;gap:14px;margin-bottom:16px}.editorial-heading-row>.photo-inspiration.native-photo.heading-photograph{width:min(100%,270px)!important;max-width:270px!important;height:auto!important;justify-self:start!important}.reports-analytics.organized-report-insights{grid-template-columns:1fr!important}.report-insight-row{grid-template-columns:1fr;gap:14px}.report-insight-row>.photo-inspiration.native-photo{width:min(100%,300px)!important;max-width:300px!important;height:auto!important;justify-self:start!important}.editorial-heading-row>.welcome{flex-wrap:wrap}}
+
+.report-insight-row>.workspace-panel{height:220px!important;min-height:220px!important;overflow:auto}
+@media(max-width:850px){.report-insight-row>.workspace-panel{height:200px!important;min-height:200px!important}}
+@media(max-width:650px){.report-insight-row>.workspace-panel{height:auto!important;min-height:220px!important;overflow:visible}}
+
 </style>
 </head>
 <body class="signed-out">
@@ -295,7 +311,7 @@ const icons = {
 const icon = (n) =>
   `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[n] || icons.Reports}</svg>`;
 function home() {
-  return `<div class="welcome"><div><h1>Good morning, ${esc(user.name.split(" ")[0])}</h1><div class="subtitle">Here’s what’s happening today.</div></div><div class="day"><div>${new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Riyadh" })}<div class="weather">Riyadh, KSA &nbsp; | &nbsp; ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Riyadh" })}</div></div><div class="quote">Progress<br>happens through<br>people.</div></div></div><div class="alerts"><button class="alert red" data-page="Complaints"><span class="round">!</span><div><b>${recordsFor("Complaints", "Home").filter((x) => x.status === "Open").length} complaints require attention</b><small>${recordsFor("Complaints", "Home").filter((x) => x.overdue && x.status !== "Resolved").length} overdue &nbsp;·&nbsp; ${recordsFor("Complaints", "Home").filter((x) => x.status === "Open" && !x.overdue).length} open</small></div><span class="arrow">›</span></button><button class="alert orange" data-page="Tasks"><span class="round">${icon("Clock")}</span><div><b>${recordsFor("Tasks", "Home").filter((x) => x.status !== "Completed").length} follow-ups need attention</b><small>${recordsFor("Tasks", "Home").filter((x) => taskStatus(x) === "Overdue").length} overdue &nbsp;·&nbsp; ${recordsFor("Tasks", "Home").filter((x) => taskStatus(x) === "Today").length} due</small></div><span class="arrow">›</span></button><button class="alert green" data-page="Meetings"><span class="round">${icon("Meetings")}</span><div><b>You have ${recordsFor("Meetings", "Home").filter((x) => x.date === todayISO() && x.status === "Scheduled").length} meetings today</b><small>${recordsFor("Meetings", "Home").find((x) => x.date === todayISO() && x.status === "Scheduled") ? esc(recordsFor("Meetings", "Home").find((x) => x.date === todayISO() && x.status === "Scheduled").name) : "No meetings scheduled"}</small></div><span class="arrow">›</span></button></div><div class="stats">${Object.keys(
+  return `<div class="welcome"><div><h1>Good morning, ${esc(user.name.split(" ")[0])}</h1><div class="subtitle">Here’s what’s happening today.</div></div><div class="day"><div>${new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Riyadh" })}<div class="weather">Riyadh, KSA &nbsp; | &nbsp; ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Riyadh" })}</div></div></div></div><div class="alerts"><button class="alert red" data-page="Complaints"><span class="round">!</span><div><b>${recordsFor("Complaints", "Home").filter((x) => x.status === "Open").length} complaints require attention</b><small>${recordsFor("Complaints", "Home").filter((x) => x.overdue && x.status !== "Resolved").length} overdue &nbsp;·&nbsp; ${recordsFor("Complaints", "Home").filter((x) => x.status === "Open" && !x.overdue).length} open</small></div><span class="arrow">›</span></button><button class="alert orange" data-page="Tasks"><span class="round">${icon("Clock")}</span><div><b>${recordsFor("Tasks", "Home").filter((x) => x.status !== "Completed").length} follow-ups need attention</b><small>${recordsFor("Tasks", "Home").filter((x) => taskStatus(x) === "Overdue").length} overdue &nbsp;·&nbsp; ${recordsFor("Tasks", "Home").filter((x) => taskStatus(x) === "Today").length} due</small></div><span class="arrow">›</span></button><button class="alert green" data-page="Meetings"><span class="round">${icon("Meetings")}</span><div><b>You have ${recordsFor("Meetings", "Home").filter((x) => x.date === todayISO() && x.status === "Scheduled").length} meetings today</b><small>${recordsFor("Meetings", "Home").find((x) => x.date === todayISO() && x.status === "Scheduled") ? esc(recordsFor("Meetings", "Home").find((x) => x.date === todayISO() && x.status === "Scheduled").name) : "No meetings scheduled"}</small></div><span class="arrow">›</span></button></div><div class="stats">${Object.keys(
     initialCounts,
   )
     .map(
@@ -7086,14 +7102,29 @@ function refinePageLayout(main){
   const card=main.querySelector('.page-inspiration');if(card){card.classList.add('contacts-photo-card');if(card.parentElement.classList.contains('records-panel')){card.parentElement.after(card);card.classList.remove('in-panel-inspiration');}}
  }
 }
+function organizePhotoPanels(main){
+ if(activeProfile)return;
+ const card=main.querySelector('.native-photo');if(!card)return;
+ if(page==='Reports'){
+  const grid=main.querySelector('.reports-analytics');if(!grid||grid.querySelector('.report-insight-row'))return;
+  const panels=[...grid.children].filter(el=>el.classList.contains('workspace-panel'));
+  const companion=panels.at(-1);if(!companion)return;
+  const row=document.createElement('div');row.className='report-insight-row';grid.append(row);row.append(companion,card);
+  card.classList.remove('in-panel-inspiration');grid.classList.add('organized-report-insights');return;
+ }
+ if(!['Complaints','Trash','Logs'].includes(page)||main.querySelector('.editorial-heading-row'))return;
+ const heading=main.querySelector('.page-heading,.pageheading,.welcome');if(!heading)return;
+ const row=document.createElement('div');row.className='editorial-heading-row';heading.before(row);row.append(heading,card);
+ card.classList.remove('in-panel-inspiration');card.classList.add('heading-photograph');
+}
 const editorialLogsHTML=logsHTML;
-logsHTML=function(){const shell=document.createElement('div');shell.innerHTML=editorialLogsHTML();placeInspiration(shell);return shell.innerHTML;};
+logsHTML=function(){const shell=document.createElement('div');shell.innerHTML=editorialLogsHTML();placeInspiration(shell);organizePhotoPanels(shell);return shell.innerHTML;};
 const editorialRender=render;
 render=function(){
  editorialRender();if(!window.DGJSession.ready)return;
- const main=document.getElementById('main');main.querySelectorAll('.quote-card').forEach(el=>el.remove());placeInspiration(main);refinePageLayout(main);
+ const main=document.getElementById('main');main.querySelectorAll('.quote-card').forEach(el=>el.remove());placeInspiration(main);refinePageLayout(main);organizePhotoPanels(main);
  main.querySelectorAll('img.banner').forEach(el=>el.remove());
- const quote=main.querySelector('.quote');if(quote)quote.innerHTML='People lead.<br>Progress follows.';
+ main.querySelectorAll('.quote').forEach(el=>el.remove());
 };
 
 </script>
